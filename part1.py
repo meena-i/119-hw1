@@ -99,9 +99,12 @@ def load_input():
     # columns we are interested in using the NEW_COLUMNS variable above.
     # Make sure you return the columns in the new order.
     # TODO
+    df_2019 = df_2019[NEW_COLUMNS]
+    df_2020 = df_2020[NEW_COLUMNS]
+    df_2021 = df_2021[NEW_COLUMNS]
 
     # When you are done, remove the next line...
-    raise NotImplementedError
+    #raise NotImplementedError
 
     # ...and keep this line to return the dataframes.
     return [df_2019, df_2020, df_2021]
@@ -137,10 +140,24 @@ def q2(dfs):
     """
     # Check:
     # - that all three dataframes have the same shape
+    shape = dfs[0].shape
+    rows = len(dfs[0])
+    cols = len(NEW_COLUMNS)
+    for df in dfs:
+        #print(df)
+        if df.shape != shape:
+            return False
     # - the number of rows
+        if len(df) != rows:
+            return False
     # - the number of columns
+        if len(df.columns) != cols:
+            return False
     # - the columns are listed in the correct order
-    raise NotImplementedError
+        if list(df.columns) != NEW_COLUMNS:
+            return False
+    return True
+    #raise NotImplementedError
 
 """
 ===== Interlude: Checking your output so far =====
@@ -181,7 +198,12 @@ def q3(dfs):
     # - that the set of university names in each year is the same
     # Return:
     # - True if they are the same, and False otherwise.
-    raise NotImplementedError
+    names = set(dfs[0]['university'])
+    for df in dfs:
+        if set(df['university']) != names:
+            return False
+    return True
+    #raise NotImplementedError
 
 """
 3b (commentary).
@@ -189,7 +211,8 @@ Did the checks pass or fail?
 Comment below and explain why.
 
 === ANSWER Q3b BELOW ===
-
+The checks failed because even though each dataframe has the same number of schools,
+they do not have all of the same schools listed.
 === END OF Q3b ANSWER ===
 """
 
