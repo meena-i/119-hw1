@@ -1,24 +1,28 @@
 q1,3
 q2,True
 q3a,False
-q4,Not Implemented
-q5a,Not Implemented
-q5b,Not Implemented
-q5c,Not Implemented
-q6c,Not Implemented
-q7,Not Implemented
-q8a,Not Implemented
-q9,Not Implemented
-q10,Not Implemented
-q11,Not Implemented
-q12,Not Implemented
-q13,Not Implemented
-q14a,Not Implemented
-q15,Not Implemented
-q16,Not Implemented
-q17,Not Implemented
-q18,Not Implemented
-q20a,Not Implemented
-q20b,Not Implemented
-q21,Not Implemented
-PART 1,20
+q4,['University of Amsterdam', 'Sungkyunkwan University(SKKU)', 'University of California, San Diego (UCSD)', 'KTH Royal Institute of Technology', 'Durham University']
+q5a,[100, 100, 100, 100, 100, 100, 100, 100]
+q5b,[100, 100, 100, 100, 100, 100, 100, 100]
+q5c,100
+q6c,1
+q7,[9, 9, 9]
+q8a,29
+q9,[67.041, 67.68, 73.539, 82.147, 75.504]
+q10,5
+q11,academic reputation       82.25
+employer reputation       75.30
+faculty student          100.00
+citations per faculty     95.95
+overall score             91.80
+Name: Singapore, dtype: float64
+q12,('Singapore', 'Canada')
+q13,output/13a.png
+q14a,output/14a.png
+q15,(10, 4)
+q16,['university', 'overall score 2019', 'overall score 2020', 'overall score 2021']
+q17,output/17a.png
+q18,output/18.png
+q20a,92.635
+q20b,['University of California, Berkeley (UCB)', 'Stanford University', 'Harvard University', 'National University of Singapore (NUS)', 'Yale University', 'Peking University', 'University of Michigan-Ann Arbor', 'University of California, Los Angeles (UCLA)', 'Massachusetts Institute of Technology (MIT)', 'University of Cambridge']
+q21,['University of California, Berkeley (UCB)', 'Massachusetts Institute of Technology (MIT)', 'Stanford University', 'Harvard University', 'University of Oxford', 'California Institute of Technology (Caltech)', 'ETH Zurich - Swiss Federal Institute of Technology', 'University of Cambridge', 'UCL', 'Imperial College London']
