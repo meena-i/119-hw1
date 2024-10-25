@@ -39,7 +39,9 @@ convert it to an integer and return it. You should get "12345".
 
 # You may need to conda install requests or pip3 install requests
 import requests
-
+import subprocess
+import os
+import part2
 def download_file(url, filename):
     r = requests.get(url)
     with open(filename, 'wb') as f:
@@ -47,24 +49,38 @@ def download_file(url, filename):
 
 def clone_repo(repo_url):
     # TODO
-    raise NotImplementedError
+    subprocess.run(["git", "clone", repo_url], check=True)
+    #raise NotImplementedError
 
 def run_script(script_path, data_path):
     # TODO
-    raise NotImplementedError
+    subprocess.run(["python", script_path, data_path], check=True)
+    #raise NotImplementedError
 
 def setup(repo_url, data_url, script_path):
     # TODO
-    raise NotImplementedError
+    data_filename = os.path.basename(data_url)
+    download_file(data_url, data_filename)
+    clone_repo(repo_url)
+    run_script(script_path, data_filename)
+    #raise NotImplementedError
 
 def q1():
     # Call setup as described in the prompt
     # TODO
+    setup(
+        "https://github.com/DavisPL-Teaching/119-hw1",
+        "https://raw.githubusercontent.com/DavisPL-Teaching/119-hw1/refs/heads/main/data/test-input.txt",
+        "test-script.py"
+    )
     # Read the file test-output.txt to a string
     # TODO
+    with open("output/test-output.txt", 'r') as f:
+        output = f.read().strip()
     # Return the integer value of the output
     # TODO
-    raise NotImplementedError
+    return int(output)
+    #raise NotImplementedError
 
 """
 2.
@@ -76,13 +92,15 @@ a. When might you need to use a script like setup() above in
 this scenario?
 
 === ANSWER Q2a BELOW ===
-
+Setup() is helpful so you don't have to redownload all the new data manually every time you
+want to update it. Also, it ensures that everyone's data is up to date and doesn't differ or 
+have errors
 === END OF Q2a ANSWER ===
 
 Do you see an alternative to using a script like setup()?
 
 === ANSWER Q2b BELOW ===
-
+Alternatives could be Jupyter Notebook or doing it manually.
 === END OF Q2b ANSWER ===
 
 3.
@@ -121,18 +139,33 @@ Hint: use subprocess again!
 Hint: search for "import" in parts 1-3. Did you miss installing
 any packages?
 """
-
+import sys
 def setup_for_new_machine():
     # TODO
-    raise NotImplementedError
+    packages = [
+        'numpy',         
+        'pandas',         
+        'matplotlib',    
+        'seaborn',
+        'scipy',
+        'pytest',
+        'pyspark',
+        'shutil',
+        'time',
+        'sys'
+    ]
+    for p in packages:
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', p])
+
+    #raise NotImplementedError
 
 def q3():
     # As your answer, return a string containing
     # the operating system name that you assumed the
     # new machine to have.
     # TODO
-    raise NotImplementedError
-    # os =
+    #raise NotImplementedError
+    os = 'Windows'
     return os
 
 """
@@ -145,7 +178,9 @@ scripts like setup() and setup_for_new_machine()
 in their day-to-day jobs?
 
 === ANSWER Q4 BELOW ===
-
+I don't think they would spend that much time writing these types of scripts because they 
+would probably only have to do it once at the beginning of a new project, but I would assume
+it's possible to reuse past scripts.
 === END OF Q4 ANSWER ===
 
 5. Extra credit
@@ -208,19 +243,31 @@ Hints:
 
 def pipeline_shell():
     # TODO
-    raise NotImplementedError
+    output = os.popen("cat population.csv | tail -n +2 | wc -l").read().strip()
+    #raise NotImplementedError
     # Return resulting integer
+    return int(output)
 
 def pipeline_pandas():
     # TODO
-    raise NotImplementedError
+    df = pd.read_csv("population.csv")
+    #raise NotImplementedError
     # Return resulting integer
+    return len(df)
 
 def q6():
     # As your answer to this part, check that both
     # integers are the same and return one of them.
     # TODO
-    raise NotImplementedError
+    shell_count = pipeline_shell()
+    pd_count = pipeline_pandas()
+    
+    # Check if both counts are the same and return one of them
+    if shell_count == pds_count:
+        return shell_count
+    else:
+        raise ValueError("Counts do not match!")
+    #raise NotImplementedError
 
 """
 Let's do a performance comparison between the two methods.
@@ -231,13 +278,20 @@ from part 2 to get answers for both pipelines.
 
 7. Throughput
 """
-
 def q7():
     # Return a tuple of two floats
     # throughput for shell, throughput for pandas
     # (in rows per second)
     # TODO
-    raise NotImplementedError
+    h = ThroughputHelper()
+
+    h.add_pipeline('shell', len(pd.read_csv("population.csv")), pipeline_shell)
+    h.add_pipeline('pandas', len(pd.read_csv("population.csv")), pipeline_pandas)
+
+    throughputs = h.compare_throughput()
+
+    return tuple(throughputs)
+    #raise NotImplementedError
 
 """
 8. Latency
@@ -248,7 +302,15 @@ def q8():
     # latency for shell, latency for pandas
     # (in milliseconds)
     # TODO
-    raise NotImplementedError
+    h = LatencyHelper()
+
+    h.add_pipeline('shell', pipeline_shell)
+    h.add_pipeline('pandas', pipeline_pandas)
+
+    latencies = h.compare_latency()
+
+    return tuple(latencies)
+    #raise NotImplementedError
 
 """
 9. Which method is faster?
@@ -293,7 +355,7 @@ def PART_3_PIPELINE():
     log_answer("q1", q1)
     # 2a: commentary
     # 2b: commentary
-    log_answer("q3", q3)
+    #log_answer("q3", q3)
     # 4: commentary
     # 5: extra credit
     log_answer("q6", q6)

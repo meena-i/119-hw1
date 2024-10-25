@@ -225,11 +225,11 @@ class LatencyHelper:
             total_time = 0
             for _ in range(NUM_RUNS):
                 start_time = time.time()
-                func()  # Run the pipeline function
+                func()  
                 end_time = time.time()
                 total_time += (end_time - start_time)
 
-            avg_time = (total_time / NUM_RUNS) * 1000  # Convert to milliseconds
+            avg_time = (total_time / NUM_RUNS) * 1000
             latencies.append(avg_time)
 
         self.latencies = latencies
@@ -401,49 +401,30 @@ def load_input(filename):
     # Return a dataframe containing the population data
     # **Clean the data here**
     df = pd.read_csv(filename,  encoding='latin-1')
-    df = df[df['Code'] != 'OWID_WRL']
-    #df = df[~df['Code'].str.contains('(UN)')]
-    #df = df[~df['Entity'].str.contains(['Europe', 'Asia', 'Africa',''])]
+    
+    df = df[~df['Code'].isnull()]
+    df = df[~df['Code'].str.contains('OWID')]
+    df = df[~df['Code'].str.contains("(UN)")]
+   
     return df
     # raise NotImplementedError
 
 def population_pipeline(df):
     # Input: the dataframe from load_input()
     # Return a list of min, median, max, mean, and standard deviation
-    grouped_df = df.groupby('Entity')
-    '''
-    Then, set up a simple pipeline that computes summary statistics
-for the following:
-- *Year over year increase* in population, per country
-    (min, median, max, mean, and standard deviation)
-How you should compute this:
-- For each country, we need the maximum year and the minimum year
-in the data. We should divide the population difference
-over this time by the length of the time period.
-- Make sure you throw out the cases where there is only one year
-(if any).
-- We should at this point have one data point per country.
-'''
-    def yr_over_yr_inc(country):
-        min_yr = country.groupby['Year'].min()
-        max_yr = country.groupby['Year'].max()
-        min_pop = country[country.groupby['Year'] == min_yr]['Population (historical)'].values[0]
-        max_pop = country[country.groupby['Year'] == max_yr]['Population (historical)'].values[0]
 
-        if min_yr == max_yr:
-            return pd.NA
-        return (max_pop - min_pop)/(max_yr - min_yr)
     
-    df['pop_inc'] = grouped_df.apply(yr_over_yr_inc)
-    df_clean = df.dropna(subset=['yearly_increase'])
-    summary_stats = [df_clean.describe().loc["min"]["yearly increase"], 
-                     df_clean.describe().loc["50%"]["yearly increase"],
-                     df_clean.describe().loc["max"]["yearly increase"],
-                     df_clean.describe().loc["mean"]["yearly increase"],
-                     df_clean.describe().loc["std"]["yearly increase"]]
-    return summary_stats
+    grouped_df = df.groupby('Entity').agg(min_yr = ('Year','min'),
+                                   max_yr = ('Year','max'),
+                                   min_pop = ("Population (historical)",'first'),
+                                   max_pop = ("Population (historical)",'last'))
     
-    
+    grouped_df = grouped_df[grouped_df['max_yr'] != grouped_df['min_yr']]
+    grouped_df['pop_inc'] = (grouped_df['max_pop'] - grouped_df['min_pop'])/(grouped_df['max_yr'] - grouped_df['min_yr'])
+
+    stats = grouped_df['pop_inc'].describe()[['min', '50%', 'max', 'mean', 'std']].tolist()
+
+    return stats
     
     #raise NotImplementedError
     
@@ -479,17 +460,29 @@ Make four versions of load input that load your datasets.
 """
 
 def load_input_small():
-    raise NotImplementedError
+    df_small = load_input('/workspaces/119-hw1/data/population.csv').head(600)
+    df_small.to_csv('data/population-small.csv', index=False)
+    return df_small
+    #raise NotImplementedError
 
 def load_input_medium():
-    raise NotImplementedError
+    df_medium = load_input('/workspaces/119-hw1/data/population.csv').head(6000)
+    df_medium.to_csv('data/population-medium.csv', index=False)
+    return df_medium
+    #raise NotImplementedError
 
 def load_input_large():
-    raise NotImplementedError
+    df_large = load_input('/workspaces/119-hw1/data/population.csv')
+    df_large.to_csv('data/population-small.csv', index=False)
+    return df_large
+    #raise NotImplementedError
 
 def load_input_single_row():
     # This is the pipeline we will use for latency.
-    raise NotImplementedError
+    df_single = load_input('/workspaces/119-hw1/data/population.csv').head(1)
+    df_single.to_csv('data/population-single-row.csv', index=False)
+    return df_single
+    #raise NotImplementedError
 
 def q7():
     # Don't modify this part
@@ -515,16 +508,24 @@ Each should call your population_pipeline from Q7.
 """
 
 def baseline_small():
-    raise NotImplementedError
+    s = load_input_small()
+    return population_pipeline(s)
+    #raise NotImplementedError
 
 def baseline_medium():
-    raise NotImplementedError
+    m = load_input_medium()
+    return population_pipeline(m)
+    #raise NotImplementedError
 
 def baseline_large():
-    raise NotImplementedError
+    l = load_input_large()
+    return population_pipeline(l)
+    #raise NotImplementedError
 
 def baseline_latency():
-    raise NotImplementedError
+    x = load_input_single_row()
+    return population_pipeline(x)
+    #raise NotImplementedError
 
 def q8():
     # Don't modify this part
@@ -554,34 +555,62 @@ b. Generate a plot in output/q9b.png of the latencies
 """
 
 # TODO
-# POPULATION_SMALL =
-# POPULATION_MEDIUM =
-# POPULATION_LARGE =
-# POPULATION_SINGLE_ROW =
+df = load_input('/workspaces/119-hw1/data/population.csv')
+POPULATION_SMALL = df.head(600)
+POPULATION_MEDIUM = df.head(6000)
+POPULATION_LARGE = df.copy()
+POPULATION_SINGLE_ROW = df.head(1)
 
 def fromvar_small():
-    raise NotImplementedError
+    return population_pipeline(POPULATION_SMALL)
+    #raise NotImplementedError
 
 def fromvar_medium():
-    raise NotImplementedError
+    return population_pipeline(POPULATION_MEDIUM)
+    #raise NotImplementedError
 
 def fromvar_large():
-    raise NotImplementedError
+    return population_pipeline(POPULATION_LARGE)
+    #raise NotImplementedError
 
 def fromvar_latency():
-    raise NotImplementedError
+    return population_pipeline(POPULATION_SINGLE_ROW)
+    #raise NotImplementedError
 
 def q9a():
     # Add all 6 pipelines for a throughput comparison
     # Generate plot in ouptut/q9a.png
     # Return list of 6 throughputs
-    raise NotImplementedError
+    h = ThroughputHelper()
+
+    h.add_pipeline('baseline_small', len(POPULATION_SMALL), baseline_small)
+    h.add_pipeline('baseline_medium', len(POPULATION_MEDIUM), baseline_medium)
+    h.add_pipeline('baseline_large', len(POPULATION_LARGE), baseline_large)
+
+    h.add_pipeline('fromvar_small', len(POPULATION_SMALL), fromvar_small)
+    h.add_pipeline('fromvar_medium', len(POPULATION_MEDIUM), fromvar_medium)
+    h.add_pipeline('fromvar_large', len(POPULATION_LARGE), fromvar_large)
+
+    throughputs = h.compare_throughput()
+    h.generate_plot('output/q9a.png')
+    return throughputs
+    #raise NotImplementedError
 
 def q9b():
     # Add 2 pipelines for a latency comparison
     # Generate plot in ouptut/q9b.png
     # Return list of 2 latencies
-    raise NotImplementedError
+    h = LatencyHelper()
+    
+    h.add_pipeline('baseline_latency', baseline_latency)
+    h.add_pipeline('fromvar_latency', fromvar_latency)
+    
+    latencies = h.compare_latency()
+
+    h.generate_plot('output/q9b.png')
+    return latencies
+    
+    #raise NotImplementedError
 
 """
 10.
@@ -591,7 +620,12 @@ Which differs more, throughput or latency?
 What does this experiment show?
 
 ===== ANSWER Q10 BELOW =====
-
+The throughput for fromvar_large is extremely large compared to the rest
+of the throughputs. However, baseline latency is much larger than fromvar
+latency. Throughput definitely differs more, and a larger throughput for
+fromvar shows that it is faster to access data from memory, especially 
+larger datasets. Fromvar also has smaller latency which supports this
+claim.
 ===== END OF Q10 ANSWER =====
 """
 
@@ -619,17 +653,47 @@ Create a new pipeline:
 - Add all of these to a Python list. Then manually compute the summary
   statistics for the list (min, median, max, mean, and standard deviation).
 """
-
+import numpy as np
 def for_loop_pipeline(df):
     # Input: the dataframe from load_input()
     # Return a list of min, median, max, mean, and standard deviation
-    raise NotImplementedError
+ 
+    pop_inc_list = [] 
+
+    for country in df['Entity'].unique():  
+        country_data = df[df['Entity'] == country]
+        
+        if len(country_data) > 1: 
+            min_year = country_data['Year'].min()
+            max_year = country_data['Year'].max()
+            min_pop = country_data[country_data['Year'] == min_year]['Population (historical)'].values[0]
+            max_pop = country_data[country_data['Year'] == max_year]['Population (historical)'].values[0]
+
+            pop_diff = max_pop - min_pop
+            year_diff = max_year - min_year
+            
+            if year_diff > 0:
+                pop_inc_list.append(pop_diff / year_diff)
+        elif len(country_data) == 1:
+            pop_inc_list.append(country_data['Population (historical)'] / country_data['Year'])
+    
+    
+    stats = [float(min(pop_inc_list)), 
+             float(np.median(pop_inc_list)),
+             float(max(pop_inc_list)),
+             float(np.mean(pop_inc_list)),
+             float(np.std(pop_inc_list))]
+    
+    return stats
+    #raise NotImplementedError
 
 def q11():
     # As your answer to this part, call load_input() and then
     # for_loop_pipeline() to return the 5 numbers.
     # (these should match the numbers you got in Q6.)
-    raise NotImplementedError
+    df = load_input('/workspaces/119-hw1/data/population.csv')
+    return for_loop_pipeline(df)
+    #raise NotImplementedError
 
 """
 12.
@@ -639,16 +703,20 @@ As before, write 4 pipelines based on the datasets from Q7.
 """
 
 def for_loop_small():
-    raise NotImplementedError
+    return for_loop_pipeline(POPULATION_SMALL)
+    #raise NotImplementedError
 
 def for_loop_medium():
-    raise NotImplementedError
+    return for_loop_pipeline(POPULATION_MEDIUM)
+    #raise NotImplementedError
 
 def for_loop_large():
-    raise NotImplementedError
+    return for_loop_pipeline(POPULATION_LARGE)
+    #raise NotImplementedError
 
 def for_loop_latency():
-    raise NotImplementedError
+    return for_loop_pipeline(POPULATION_SINGLE_ROW)
+    #raise NotImplementedError
 
 def q12():
     # Don't modify this part
@@ -673,13 +741,34 @@ def q13a():
     # Add all 6 pipelines for a throughput comparison
     # Generate plot in ouptut/q13a.png
     # Return list of 6 throughputs
-    raise NotImplementedError
+    h = ThroughputHelper()
+
+    h.add_pipeline('baseline_small', len(POPULATION_SMALL), baseline_small)
+    h.add_pipeline('baseline_medium', len(POPULATION_MEDIUM), baseline_medium)
+    h.add_pipeline('baseline_large', len(POPULATION_LARGE), baseline_large)
+
+    h.add_pipeline('for_loop_small', len(POPULATION_SMALL), for_loop_small)
+    h.add_pipeline('for_loop_medium', len(POPULATION_MEDIUM), for_loop_medium)
+    h.add_pipeline('for_loop_large', len(POPULATION_LARGE), for_loop_large)
+
+    throughputs = h.compare_throughput()
+    h.generate_plot('output/q13a.png')
+    return throughputs
+    #raise NotImplementedError
 
 def q13b():
     # Add 2 pipelines for a latency comparison
     # Generate plot in ouptut/q13b.png
     # Return list of 2 latencies
-    raise NotImplementedError
+    h = LatencyHelper()
+
+    h.add_pipeline('baseline_latency', baseline_latency)
+    h.add_pipeline('for_loop_latency', for_loop_latency)
+
+    latencies = h.compare_latency()
+    h.generate_plot('output/q13b.png')
+    return latencies
+    #raise NotImplementedError
 
 """
 14.
@@ -688,13 +777,15 @@ Comment on the results you got!
 14a. Which pipelines is faster in terms of throughput?
 
 ===== ANSWER Q14a BELOW =====
-
+For the largest dataset, the baseline pipeline was faster, but for the
+small and medium datasets, the for loop pipeline was faster.
 ===== END OF Q14a ANSWER =====
 
 14b. Which pipeline is faster in terms of latency?
 
 ===== ANSWER Q14b BELOW =====
-
+The for loop pipeline is faster in terms of latency because it has a
+lower value.
 ===== END OF Q14b ANSWER =====
 
 14c. Do you notice any other interesting observations?
@@ -810,20 +901,20 @@ def PART_2_PIPELINE():
 
     # Q1-5
     log_answer("q1", q1)
-    log_answer("q2a", q2a)
+    #log_answer("q2a", q2a)
     # 2b: commentary
-    log_answer("q3", q3)
-    log_answer("q4a", q4a)
+    #log_answer("q3", q3)
+    #log_answer("q4a", q4a)
     # 4b: commentary
-    log_answer("q5a", q5a)
-    log_answer("q5b", q5b)
+    #log_answer("q5a", q5a)
+    #log_answer("q5b", q5b)
 
     # Q6-10
-    log_answer("q6", q6)
-    log_answer("q7", q7)
-    log_answer("q8", q8)
-    log_answer("q9a", q9a)
-    log_answer("q9b", q9b)
+    #log_answer("q6", q6)
+    #log_answer("q7", q7)
+    #log_answer("q8", q8)
+    #log_answer("q9a", q9a)
+    #log_answer("q9b", q9b)
     # 10: commentary
 
     # Q11-14
