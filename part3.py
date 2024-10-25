@@ -42,14 +42,20 @@ import requests
 import subprocess
 import os
 import part2
+
 def download_file(url, filename):
     r = requests.get(url)
+    r.raise_for_status()
     with open(filename, 'wb') as f:
         f.write(r.content)
 
 def clone_repo(repo_url):
     # TODO
-    subprocess.run(["git", "clone", repo_url], check=True)
+    repo_name = os.path.basename(repo_url).replace('.git', '')  # Extract repo name from URL
+    if os.path.exists(repo_name):
+        print(f"Repository '{repo_name}' already exists. Skipping clone.")
+    else:
+        subprocess.run(["git", "clone", repo_url], check=True)
     #raise NotImplementedError
 
 def run_script(script_path, data_path):
@@ -243,14 +249,14 @@ Hints:
 
 def pipeline_shell():
     # TODO
-    output = os.popen("cat population.csv | tail -n +2 | wc -l").read().strip()
+    output = os.popen("cat /workspaces/119-hw1/data/population.csv | wc -l").read().strip()
     #raise NotImplementedError
     # Return resulting integer
     return int(output)
 
 def pipeline_pandas():
     # TODO
-    df = pd.read_csv("population.csv")
+    df = pd.read_csv('/workspaces/119-hw1/data/population.csv')
     #raise NotImplementedError
     # Return resulting integer
     return len(df)
@@ -261,9 +267,9 @@ def q6():
     # TODO
     shell_count = pipeline_shell()
     pd_count = pipeline_pandas()
-    
+    #print(shell_count, pd_count)
     # Check if both counts are the same and return one of them
-    if shell_count == pds_count:
+    if shell_count == pd_count:
         return shell_count
     else:
         raise ValueError("Counts do not match!")
@@ -283,10 +289,11 @@ def q7():
     # throughput for shell, throughput for pandas
     # (in rows per second)
     # TODO
-    h = ThroughputHelper()
+    h = part2.ThroughputHelper()
+    df = pd.read_csv('/workspaces/119-hw1/data/population.csv')
 
-    h.add_pipeline('shell', len(pd.read_csv("population.csv")), pipeline_shell)
-    h.add_pipeline('pandas', len(pd.read_csv("population.csv")), pipeline_pandas)
+    h.add_pipeline('shell', len(df), pipeline_shell)
+    h.add_pipeline('pandas', len(df), pipeline_pandas)
 
     throughputs = h.compare_throughput()
 
@@ -302,7 +309,7 @@ def q8():
     # latency for shell, latency for pandas
     # (in milliseconds)
     # TODO
-    h = LatencyHelper()
+    h = part2.LatencyHelper()
 
     h.add_pipeline('shell', pipeline_shell)
     h.add_pipeline('pandas', pipeline_pandas)
@@ -317,7 +324,9 @@ def q8():
 Comment on anything else you notice below.
 
 === ANSWER Q9 BELOW ===
-
+The shell pipeline has a higher throughput and lower latency, which means
+it is the faster method. The pandas pipeline has about 5 times smaller 
+throughput, but about double the latency.
 === END OF Q9 ANSWER ===
 """
 
@@ -355,7 +364,7 @@ def PART_3_PIPELINE():
     log_answer("q1", q1)
     # 2a: commentary
     # 2b: commentary
-    #log_answer("q3", q3)
+    log_answer("q3", q3)
     # 4: commentary
     # 5: extra credit
     log_answer("q6", q6)

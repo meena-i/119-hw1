@@ -1,7 +1,7 @@
 q1,3
 q2,True
 q3a,False
-q4,['Durham University', 'Université PSL', 'Seoul National University', 'Tokyo Institute of Technology (Tokyo Tech)', 'University of Leeds']
+q4,['University of Southampton', 'Universidad de Buenos Aires (UBA)', 'Cornell University', 'The University of Manchester', 'The University of Hong Kong']
 q5a,[100, 100, 100, 100, 100, 100, 100, 100]
 q5b,[100, 100, 100, 100, 100, 100, 100, 100]
 q5c,100

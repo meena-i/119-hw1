@@ -901,20 +901,20 @@ def PART_2_PIPELINE():
 
     # Q1-5
     log_answer("q1", q1)
-    #log_answer("q2a", q2a)
+    log_answer("q2a", q2a)
     # 2b: commentary
-    #log_answer("q3", q3)
-    #log_answer("q4a", q4a)
+    log_answer("q3", q3)
+    log_answer("q4a", q4a)
     # 4b: commentary
-    #log_answer("q5a", q5a)
-    #log_answer("q5b", q5b)
+    log_answer("q5a", q5a)
+    log_answer("q5b", q5b)
 
     # Q6-10
-    #log_answer("q6", q6)
-    #log_answer("q7", q7)
-    #log_answer("q8", q8)
-    #log_answer("q9a", q9a)
-    #log_answer("q9b", q9b)
+    log_answer("q6", q6)
+    log_answer("q7", q7)
+    log_answer("q8", q8)
+    log_answer("q9a", q9a)
+    log_answer("q9b", q9b)
     # 10: commentary
 
     # Q11-14
