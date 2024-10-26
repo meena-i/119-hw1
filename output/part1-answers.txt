@@ -1,7 +1,7 @@
 q1,3
 q2,True
 q3a,False
-q4,['University of Southampton', 'Universidad de Buenos Aires (UBA)', 'Cornell University', 'The University of Manchester', 'The University of Hong Kong']
+q4,["King's College London", 'Shanghai Jiao Tong University', 'The University of Edinburgh', 'Imperial College London', 'University of British Columbia']
 q5a,[100, 100, 100, 100, 100, 100, 100, 100]
 q5b,[100, 100, 100, 100, 100, 100, 100, 100]
 q5c,100
@@ -26,4 +26,3 @@ q18,output/18.png
 q20a,92.635
 q20b,['University of California, Berkeley (UCB)', 'Stanford University', 'Harvard University', 'National University of Singapore (NUS)', 'Yale University', 'Peking University', 'University of Michigan-Ann Arbor', 'University of California, Los Angeles (UCLA)', 'Massachusetts Institute of Technology (MIT)', 'University of Cambridge']
 q21,['University of California, Berkeley (UCB)', 'Massachusetts Institute of Technology (MIT)', 'Stanford University', 'Harvard University', 'University of Oxford', 'California Institute of Technology (Caltech)', 'ETH Zurich - Swiss Federal Institute of Technology', 'University of Cambridge', 'UCL', 'Imperial College London']
-PART 1,0

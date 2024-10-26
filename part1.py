@@ -143,8 +143,8 @@ def q2(dfs):
     shape = dfs[0].shape
     rows = len(dfs[0])
     cols = len(NEW_COLUMNS)
+
     for df in dfs:
-        #print(df)
         if df.shape != shape:
             return False
     # - the number of rows
@@ -434,7 +434,7 @@ As your answer to this part, return the number of columns in each dataframe afte
 """
 
 def q7(dfs):
-    # TODO
+    # TODO appending year columns to the dataframes and returning the number of cols in each df
     year = 2019
     num_cols = []
     for df in dfs:
@@ -453,7 +453,7 @@ As your answer, return the count for "USA" in 2021.
 """
 
 def q8a(dfs):
-    # Enter Code here
+    # count of universities in top 100 by region
     # TODO
     for df in dfs:
         print(df.groupby('region').size())
@@ -486,7 +486,7 @@ The list should contain 5 elements.
 """
 
 def q9(dfs):
-    # Enter code here
+    # averages of each column in a list
     # TODO
     avgs = dfs[2].describe().loc['mean'].iloc[1:6].tolist()
     #raise NotImplementedError
@@ -504,11 +504,10 @@ Then in q10, print the first 5 rows of the avg_2021 dataframe.
 """
 
 def q10_helper(dfs):
-    # Enter code here
+    # average of each col by region
     # TODO
     avg_2021 = dfs[2].groupby(['region'])[['academic reputation', 'employer reputation', 
                                 'faculty student', 'citations per faculty', 'overall score']].mean()
-    # Placeholder for the avg_2021 dataframe
     return avg_2021
 
 def q10(avg_2021):
@@ -531,7 +530,7 @@ Sort the avg_2021 dataframe from the previous question based on overall score in
 
 As your answer to this part, return the first row of the sorted dataframe.
 """
-
+# returns row with highest overall score
 def q11(avg_2021):
     #raise NotImplementedError
     sorted_avg_2021 = avg_2021.sort_values(by='overall score', ascending = False)
@@ -552,22 +551,10 @@ down in the rankings.)
 
 For the answer to this part return the name of the country that tops the ranking and the name of one country that went down in the rankings.
 """
-'''
-def q12_helper(dfs):
-    avg_2019 = dfs[0].groupby(['region'])[['academic reputation', 'employer reputation', 
-                                'faculty student', 'citations per faculty', 'overall score']].mean()
-    sorted_avg_2019 = avg_2019.sort_values(by='overall score', ascending = False)
 
-    avg_2021 = dfs[2].groupby(['region'])[['academic reputation', 'employer reputation', 
-                                'faculty student', 'citations per faculty', 'overall score']].mean()
-    sorted_avg_2021 = avg_2021.sort_values(by='overall score', ascending = False)
-
-    merged_df = pd.merge(dfs[0].groupby(['region'])[[ 'overall score']].mean().sort_values(by='overall score', ascending = False)[['overall score']], 
-    dfs[2].groupby(['region'])[[ 'overall score']].mean().sort_values(by='overall score', ascending = False)[['overall score']], on='region')
-    return merged_df
-'''
 def q12a(avg_2021):
     #raise NotImplementedError
+    #Merged df i used to find which countries went down in ranking:
     #merged_df = pd.merge(dfs[0].groupby(['region'])[[ 'overall score']].mean().sort_values(by='overall score', ascending = False)[['overall score']], 
     #avg_2021.sort_values(by='overall score', ascending = False)[['overall score']], on='region')
     return ('Singapore', "Canada")
@@ -588,11 +575,8 @@ students can get personalized help a lot easier than at larger universities.
 """
 13a.
 Represent all the attributes in the avg_2021 dataframe using a box and whisker plot.
-
 Store your plot in output/13a.png.
-
 As the answer to this part, return the name of the plot you saved.
-
 **Hint:** You can do this using subplots (and also otherwise)
 """
 
@@ -620,7 +604,9 @@ b. Do you observe any anomalies in the box and whisker
 plot?
 
 === ANSWER Q13b BELOW ===
-There is an outlier for overall score on the higher end.
+There is an outlier for overall score on the higher end, but I don't really see any anomalies
+besides that. Academic reuptation has a very large range, and so do employer reputation and
+faculty student ratio.
 === END OF Q13b ANSWER ===
 """
 
@@ -641,7 +627,6 @@ def q14a(avg_2021):
 
     plt.scatter(avg_2021['academic reputation'], avg_2021['overall score'])
 
-    # Set title and labels
     plt.title('Scatter Plot of Academic Reputation vs Overall Score')
     plt.xlabel("Academic Reputation")
     plt.ylabel("Overall Score")
@@ -656,7 +641,7 @@ Do you observe any general trend?
 
 === ANSWER Q14b BELOW ===
 There seems to be a positive trend between academic reputation and overall score. It looks
-somewhat quadratic.
+somewhat quadratic, but the correlation is not very strong.
 === END OF Q14b ANSWER ===
 
 ===== Questions 15-20: Exploring the data further =====
@@ -703,7 +688,7 @@ For the columns representing scores, rename them such that they describe the dat
 You should be able to modify the column names directly in the dataframe.
 As your answer, return the new column names.
 """
-
+# changing column names to show which year the overall score corresponds to
 def q16(top_10):
     # Enter code here
     # TODO
@@ -729,6 +714,8 @@ def q17a(top_10):
     # Enter code here
     # TODO
     plt.figure(figsize=(12, 8))
+
+    #iterate over each year to plot overall scores for each university over time
     for index, row in top_10.iterrows():
         plt.plot(['2019', '2020', '2021'], 
                  [row['overall score 2019'], row['overall score 2020'], row['overall score 2021']],
@@ -738,9 +725,8 @@ def q17a(top_10):
     plt.xlabel('Year')
     plt.ylabel('Score')
 
-    # Add legend
     plt.legend(title="University", bbox_to_anchor=(1, 1), loc='upper left')
-    plt.tight_layout()
+    plt.tight_layout() #so the legend doesn't overlap on the graph
     plt.savefig('output/17a.png')
     plt.close()
     #raise NotImplementedError
@@ -795,6 +781,7 @@ def q18(dfs):
     plt.tight_layout()
     plt.show()
     plt.savefig('output/18.png')
+    plt.close()
     #raise NotImplementedError
     return "output/18.png"
 
@@ -841,6 +828,7 @@ Use your new column to sort the data by the new values and return the top 10 uni
 
 def q20a(dfs):
     # TODO
+    # providing weights for each column that make it so that berkeley is #1
     dfs[2]['new_score'] = (
         0.0 * dfs[2]['academic reputation'] - 
         0.05 * dfs[2]['employer reputation'] +  
@@ -857,6 +845,7 @@ def q20b(dfs):
     # TODO
     df_2021_sorted = dfs[2].sort_values(by='new_score', ascending=False)
     #raise NotImplementedError
+
     # For your answer, return the top 10 universities.
     top_10_universities = df_2021_sorted.head(10)['university'].tolist()
     return top_10_universities
@@ -879,13 +868,16 @@ Return the top 10 universities from the falsified data.
 import shutil
 def q21():
     # TODO
+    #make a copy of the 2021 df
     shutil.copy('data/2021.csv', 'data/2021_falsified.csv')
     df = pd.read_csv('data/2021_falsified.csv', encoding='latin-1')
 
+    #manually changing overall score values
     df.loc[df['University'] == 'University of California, Berkeley (UCB)', 'Overall Score'] = 100.0
     print(df[df['University'] == 'University of California, Berkeley (UCB)'])
     df.loc[df['University'] != 'University of California, Berkeley (UCB)', 'Overall Score'] -= 0.5
 
+    #sorting by overall score values
     df_sorted = df.sort_values(by='Overall Score', ascending=False)
     df_sorted.to_csv('data/2021_falsified.csv', index=False, encoding='latin-1')
     top_10_universities = df_sorted.head(10)['University'].tolist()

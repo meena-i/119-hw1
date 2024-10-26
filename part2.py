@@ -38,7 +38,7 @@ Fill in the add_pipeline, eval_throughput, and generate_plot functions below.
 # You may modify this if any of your tests are running particularly slow
 # or fast (though it should be at least 10).
 NUM_RUNS = 10
-
+import timeit
 class ThroughputHelper:
     def __init__(self):
         # Initialize the object.
@@ -71,22 +71,16 @@ class ThroughputHelper:
         # Make sure to use the NUM_RUNS variable.
         # Also, return the resulting list of throughputs,
         # in **number of items per second.**
-        throughputs = []
-        for func, size in zip(self.pipelines, self.sizes):
-            total_time = 0
-            for _ in range(NUM_RUNS):
-                start_time = time.time()
-                func()  
-                end_time = time.time()
-                total_time += (end_time - start_time)
+        self.throughputs = []
+        for i in range(len(self.pipelines)):
+            pipeline = self.pipelines[i]
+            size = self.sizes[i]
 
-            avg_time = total_time / NUM_RUNS
-            throughput = size / avg_time 
-            throughputs.append(throughput)
-
-        self.throughputs = throughputs
-        print(throughputs)
-        return throughputs
+            execution_time = timeit.timeit(pipeline, number=NUM_RUNS)
+            throughput = (NUM_RUNS * size)/ execution_time
+            self.throughputs.append(throughput)
+        
+        return self.throughputs
         #raise NotImplementedError
 
     def generate_plot(self, filename):
@@ -100,7 +94,6 @@ class ThroughputHelper:
         plt.xlabel('Pipelines')
         plt.ylabel('Throughput (items/second)')
         plt.title('Throughput Comparison of Pipelines')
-        #plt.legend()
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         plt.savefig(filename)
@@ -177,8 +170,9 @@ Which pipeline has the highest throughput?
 Is this what you expected?
 
 === ANSWER Q2b BELOW ===
-The large pipeline has the highest throughput, which is what I expected since it has
-the most elements.
+The medium pipeline has the highest throughput, which is not what I expected. I expected the
+smallest dataset to have the highest throughput since it would have the smallest
+processing time.
 === END OF Q2b ANSWER ===
 """
 
@@ -220,20 +214,16 @@ class LatencyHelper:
         # and store it in a list in self.latencies.
         # Also, return the resulting list of latencies,
         # in **milliseconds.**
-        latencies = []
-        for func in self.pipelines:
-            total_time = 0
-            for _ in range(NUM_RUNS):
-                start_time = time.time()
-                func()  
-                end_time = time.time()
-                total_time += (end_time - start_time)
+        self.latencies = []
+        for i in range(len(self.pipelines)):
+            pipeline = self.pipelines[i]
+            
+            execution_time = timeit.timeit(pipeline, number=NUM_RUNS)
+            latency = execution_time / NUM_RUNS * 1000
 
-            avg_time = (total_time / NUM_RUNS) * 1000
-            latencies.append(avg_time)
-
-        self.latencies = latencies
-        return latencies
+            self.latencies.append(latency)
+        
+        return self.latencies
         #raise NotImplementedError
 
     def generate_plot(self, filename):
@@ -304,9 +294,10 @@ How much did the latency vary between the three copies of the pipeline?
 Is this more or less than what you expected?
 
 === ANSWER Q1b BELOW ===
-Latency varied by a less than a thousandth of a millisecond between the three 
+Latency varied by about than a thousandth of a millisecond between the three 
 copies of the pipeline. I somewhat expected this because all three pipelines used 
-the same list item as their input so they should perform similarly.
+the only one list item as their input, so I didn't think it would take a 
+noticeable different amount of time.
 === END OF Q1b ANSWER ===
 """
 
@@ -331,9 +322,12 @@ def q5a():
     #raise NotImplementedError
     h = ThroughputHelper()
     pt1_data = part1.load_input()
+    total_length = 0
+    for df in pt1_data:
+        total_length += len(df)
 
-    h.add_pipeline('part1_pipeline', len(pt1_data), 
-                   lambda: part1.PART_1_PIPELINE())
+    print(total_length)
+    h.add_pipeline('part1_pipeline', total_length, lambda: part1.PART_1_PIPELINE())
     
     throughput = h.compare_throughput()
     return throughput
@@ -342,7 +336,6 @@ def q5b():
     # Return the latency of the pipeline in part 1.
     #raise NotImplementedError
     h = LatencyHelper()
-    pt1_data = part1.load_input()
 
     h.add_pipeline('part1_pipeline', lambda: part1.PART_1_PIPELINE())
     latency = h.compare_latency()
@@ -403,8 +396,7 @@ def load_input(filename):
     df = pd.read_csv(filename,  encoding='latin-1')
     
     df = df[~df['Code'].isnull()]
-    df = df[~df['Code'].str.contains('OWID')]
-    df = df[~df['Code'].str.contains("(UN)")]
+    df = df[~df['Code'].str.contains('OWID_WRL')]
    
     return df
     # raise NotImplementedError
@@ -412,8 +404,6 @@ def load_input(filename):
 def population_pipeline(df):
     # Input: the dataframe from load_input()
     # Return a list of min, median, max, mean, and standard deviation
-
-    
     grouped_df = df.groupby('Entity').agg(min_yr = ('Year','min'),
                                    max_yr = ('Year','max'),
                                    min_pop = ("Population (historical)",'first'),
@@ -462,6 +452,7 @@ Make four versions of load input that load your datasets.
 def load_input_small():
     df_small = load_input('/workspaces/119-hw1/data/population.csv').head(600)
     df_small.to_csv('data/population-small.csv', index=False)
+    return pd.read_csv('data/population-small.csv')
     return df_small
     #raise NotImplementedError
 
@@ -625,7 +616,8 @@ of the throughputs. However, baseline latency is much larger than fromvar
 latency. Throughput definitely differs more, and a larger throughput for
 fromvar shows that it is faster to access data from memory, especially 
 larger datasets. Fromvar also has smaller latency which supports this
-claim.
+claim. This experiment shows that it is faster to load data from 
+variables rather than loading the input from files directly.
 ===== END OF Q10 ANSWER =====
 """
 
@@ -675,16 +667,17 @@ def for_loop_pipeline(df):
             if year_diff > 0:
                 pop_inc_list.append(pop_diff / year_diff)
         elif len(country_data) == 1:
-            pop_inc_list.append(country_data['Population (historical)'] / country_data['Year'])
+            return ['null']
     
     
-    stats = [float(min(pop_inc_list)), 
+    stats = [float(np.min(pop_inc_list)), 
              float(np.median(pop_inc_list)),
-             float(max(pop_inc_list)),
+             float(np.max(pop_inc_list)),
              float(np.mean(pop_inc_list)),
              float(np.std(pop_inc_list))]
     
     return stats
+    
     #raise NotImplementedError
 
 def q11():
@@ -698,7 +691,6 @@ def q11():
 """
 12.
 Now, let's create our pipelines for comparison.
-
 As before, write 4 pipelines based on the datasets from Q7.
 """
 
@@ -785,14 +777,16 @@ small and medium datasets, the for loop pipeline was faster.
 
 ===== ANSWER Q14b BELOW =====
 The for loop pipeline is faster in terms of latency because it has a
-lower value.
+lower millisecond value.
 ===== END OF Q14b ANSWER =====
 
 14c. Do you notice any other interesting observations?
 What does this experiment show?
 
 ===== ANSWER Q14c BELOW =====
-
+This experiment shows that using a for loop is generally more efficient for
+smaller datasets than loading the input from file directly, but
+using the baseline pipeline was much faster for the largest dataset.
 ===== END OF Q14c ANSWER =====
 """
 
@@ -805,7 +799,11 @@ Which factor that we tested (file vs. variable, vectorized vs. for loop)
 had the biggest impact on performance?
 
 ===== ANSWER Q15 BELOW =====
-
+Using a pandas dataframe variable had the biggest impact on performance in
+comparison to loading input from a file because it had consistently higher
+throughputs and a lower latency. When comparing the baseline pipeline with
+a for loop pipeline, the baseline pipeline was faster for the largest dataset
+but not the smaller ones.
 ===== END OF Q15 ANSWER =====
 
 16.

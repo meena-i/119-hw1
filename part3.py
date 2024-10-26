@@ -171,7 +171,7 @@ def q3():
     # new machine to have.
     # TODO
     #raise NotImplementedError
-    os = 'Windows'
+    os = 'Linux'
     return os
 
 """
