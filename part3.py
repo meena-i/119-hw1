@@ -106,7 +106,8 @@ have errors
 Do you see an alternative to using a script like setup()?
 
 === ANSWER Q2b BELOW ===
-Alternatives could be Jupyter Notebook or doing it manually.
+Alternatives could be Jupyter Notebook, doing it manually, or setting up a 
+system that schedules updates periodically.
 === END OF Q2b ANSWER ===
 
 3.
@@ -325,8 +326,7 @@ Comment on anything else you notice below.
 
 === ANSWER Q9 BELOW ===
 The shell pipeline has a higher throughput and lower latency, which means
-it is the faster method. The pandas pipeline has about 5 times smaller 
-throughput, but about double the latency.
+it is the faster method.
 === END OF Q9 ANSWER ===
 """
 

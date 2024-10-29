@@ -71,6 +71,7 @@ class ThroughputHelper:
         # Make sure to use the NUM_RUNS variable.
         # Also, return the resulting list of throughputs,
         # in **number of items per second.**
+
         self.throughputs = []
         for i in range(len(self.pipelines)):
             pipeline = self.pipelines[i]
@@ -89,7 +90,8 @@ class ThroughputHelper:
         # the most sense.
         # Make sure you include a legend.
         # Save the result in the filename provided.
-        #plt.figure(figsize=(10, 6))
+        
+        #making a bar graph
         plt.bar(self.names, self.throughputs)
         plt.xlabel('Pipelines')
         plt.ylabel('Throughput (items/second)')
@@ -144,6 +146,7 @@ def q2a():
     # Add the 3 pipelines.
     # (You will need to create a pipeline for each one.)
     # Pipeline names: small, medium, large
+
     def small_pipeline():
         add_list(LIST_SMALL)
     def medium_pipeline():
@@ -157,6 +160,7 @@ def q2a():
 
     throughputs = h.compare_throughput()
     #raise NotImplementedError
+
     # Generate a plot.
     # Save the plot as 'output/q2a.png'.
     # TODO
@@ -171,8 +175,8 @@ Is this what you expected?
 
 === ANSWER Q2b BELOW ===
 The medium pipeline has the highest throughput, which is not what I expected. I expected the
-smallest dataset to have the highest throughput since it would have the smallest
-processing time.
+smallest dataset to have the highest throughput since it would have the smallest number of
+items to process.
 === END OF Q2b ANSWER ===
 """
 
@@ -232,11 +236,12 @@ class LatencyHelper:
         # the most sense.
         # Make sure you include a legend.
         # Save the result in the filename provided.
+
         plt.bar(self.names, self.latencies)
         plt.xlabel('Pipelines')
         plt.ylabel('Latencies (milliseconds)')
         plt.title('Latencies Comparison of Pipelines')
-        #plt.legend()
+        #plt.legend() - not really necessary for this type of chart
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         plt.savefig(filename)
@@ -269,10 +274,9 @@ on a single list item.
 LIST_SINGLE_ITEM = [10] # Note: a list with only 1 item
 
 def q4a():
-    # Create a LatencyHelper object
     h = LatencyHelper()
 
-    # Add the same pipeline three times with different names
+    #Adding the same pipeline three times with a single list item
     h.add_pipeline('single_item_pipeline_1', lambda: sum(LIST_SINGLE_ITEM))
     h.add_pipeline('single_item_pipeline_2', lambda: sum(LIST_SINGLE_ITEM))
     h.add_pipeline('single_item_pipeline_3', lambda: sum(LIST_SINGLE_ITEM))
@@ -297,7 +301,7 @@ Is this more or less than what you expected?
 Latency varied by about than a thousandth of a millisecond between the three 
 copies of the pipeline. I somewhat expected this because all three pipelines used 
 the only one list item as their input, so I didn't think it would take a 
-noticeable different amount of time.
+noticeably different amount of time.
 === END OF Q1b ANSWER ===
 """
 
@@ -448,30 +452,37 @@ and save a new file.
 Make four versions of load input that load your datasets.
 (The _large one should use the full population dataset.)
 """
-
+df = pd.read_csv('data/population.csv')
 def load_input_small():
-    df_small = load_input('/workspaces/119-hw1/data/population.csv').head(600)
-    df_small.to_csv('data/population-small.csv', index=False)
-    return pd.read_csv('data/population-small.csv')
+    df.iloc[:600].to_csv('data/population-small.csv', index=False)
+    df_small = pd.read_csv('data/population-small.csv')
+    df_small = df_small[~df_small['Code'].isnull()]
+    df_small = df_small[~df_small['Code'].str.contains('OWID_WRL')]
     return df_small
     #raise NotImplementedError
 
 def load_input_medium():
-    df_medium = load_input('/workspaces/119-hw1/data/population.csv').head(6000)
-    df_medium.to_csv('data/population-medium.csv', index=False)
-    return df_medium
+    df.iloc[:6000].to_csv('data/population-medium.csv', index=False)
+    df_med = pd.read_csv('data/population-medium.csv')
+    df_med = df_med[~df_med['Code'].isnull()]
+    df_med = df_med[~df_med['Code'].str.contains('OWID_WRL')]
+    return df_med
     #raise NotImplementedError
 
 def load_input_large():
-    df_large = load_input('/workspaces/119-hw1/data/population.csv')
-    df_large.to_csv('data/population-small.csv', index=False)
+    df.to_csv('data/population-large.csv', index=False)
+    df_large = pd.read_csv('data/population-large.csv')
+    df_large = df_large[~df_large['Code'].isnull()]
+    df_large = df_large[~df_large['Code'].str.contains('OWID_WRL')]
     return df_large
     #raise NotImplementedError
 
 def load_input_single_row():
     # This is the pipeline we will use for latency.
-    df_single = load_input('/workspaces/119-hw1/data/population.csv').head(1)
-    df_single.to_csv('data/population-single-row.csv', index=False)
+    df.iloc[:1].to_csv('data/population-single-row.csv', index=False)
+    df_single = pd.read_csv('data/population-single-row.csv')
+    df_single = df_single[~df_single['Code'].isnull()]
+    df_single = df_single[~df_single['Code'].str.contains('OWID_WRL')]
     return df_single
     #raise NotImplementedError
 
@@ -612,7 +623,7 @@ What does this experiment show?
 
 ===== ANSWER Q10 BELOW =====
 The throughput for fromvar_large is extremely large compared to the rest
-of the throughputs. However, baseline latency is much larger than fromvar
+of the throughputs. Baseline latency is larger than fromvar
 latency. Throughput definitely differs more, and a larger throughput for
 fromvar shows that it is faster to access data from memory, especially 
 larger datasets. Fromvar also has smaller latency which supports this
@@ -769,8 +780,8 @@ Comment on the results you got!
 14a. Which pipelines is faster in terms of throughput?
 
 ===== ANSWER Q14a BELOW =====
-For the largest dataset, the baseline pipeline was faster, but for the
-small and medium datasets, the for loop pipeline was faster.
+For the larger datasets, the baseline pipeline was faster, but for the
+small dataset, the for loop pipeline was faster.
 ===== END OF Q14a ANSWER =====
 
 14b. Which pipeline is faster in terms of latency?
@@ -814,7 +825,10 @@ varies with the size of the input dataset.
 This is an open ended question.)
 
 ===== ANSWER Q16 BELOW =====
-
+I think throughput initially increases as the size of the input dataset increases,
+but it eventually plateaus or diminishes if the dataset is too large. This can
+be seen in graph 2a, where the throughput for the medium pipeline was the
+largest, and it slightly decreased for the large pipeline.
 ===== END OF Q16 ANSWER =====
 
 17.
@@ -825,6 +839,10 @@ throughput is related to latency.
 This is an open ended question.)
 
 ===== ANSWER Q17 BELOW =====
+Throughput and latency are inversely correlated. In general, if a pipeline has
+a larger throughput, it has a smaller latency. In graph 9a, fromvar had higher
+throughput for the small, medium, and large pipelines compared to baseline, 
+and graph 9b shows that its latency was lower as well.
 
 ===== END OF Q17 ANSWER =====
 """
