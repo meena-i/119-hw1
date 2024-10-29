@@ -453,8 +453,12 @@ Make four versions of load input that load your datasets.
 (The _large one should use the full population dataset.)
 """
 df = pd.read_csv('data/population.csv')
+#df.head(600).to_csv('data/population-small.csv', index=False)
+#df.iloc[:6000].to_csv('data/population-medium.csv', index=False)
+#df.to_csv('data/population-large.csv', index=False)
+#df.iloc[:1].to_csv('data/population-single-row.csv', index=False)
+
 def load_input_small():
-    df.iloc[:600].to_csv('data/population-small.csv', index=False)
     df_small = pd.read_csv('data/population-small.csv')
     df_small = df_small[~df_small['Code'].isnull()]
     df_small = df_small[~df_small['Code'].str.contains('OWID_WRL')]
@@ -462,7 +466,6 @@ def load_input_small():
     #raise NotImplementedError
 
 def load_input_medium():
-    df.iloc[:6000].to_csv('data/population-medium.csv', index=False)
     df_med = pd.read_csv('data/population-medium.csv')
     df_med = df_med[~df_med['Code'].isnull()]
     df_med = df_med[~df_med['Code'].str.contains('OWID_WRL')]
@@ -470,7 +473,6 @@ def load_input_medium():
     #raise NotImplementedError
 
 def load_input_large():
-    df.to_csv('data/population-large.csv', index=False)
     df_large = pd.read_csv('data/population-large.csv')
     df_large = df_large[~df_large['Code'].isnull()]
     df_large = df_large[~df_large['Code'].str.contains('OWID_WRL')]
@@ -479,7 +481,6 @@ def load_input_large():
 
 def load_input_single_row():
     # This is the pipeline we will use for latency.
-    df.iloc[:1].to_csv('data/population-single-row.csv', index=False)
     df_single = pd.read_csv('data/population-single-row.csv')
     df_single = df_single[~df_single['Code'].isnull()]
     df_single = df_single[~df_single['Code'].str.contains('OWID_WRL')]
@@ -585,9 +586,9 @@ def q9a():
     # Return list of 6 throughputs
     h = ThroughputHelper()
 
-    h.add_pipeline('baseline_small', len(POPULATION_SMALL), baseline_small)
-    h.add_pipeline('baseline_medium', len(POPULATION_MEDIUM), baseline_medium)
-    h.add_pipeline('baseline_large', len(POPULATION_LARGE), baseline_large)
+    h.add_pipeline('baseline_small', 261, baseline_small)
+    h.add_pipeline('baseline_medium', 5122, baseline_medium)
+    h.add_pipeline('baseline_large', 55240, baseline_large)
 
     h.add_pipeline('fromvar_small', len(POPULATION_SMALL), fromvar_small)
     h.add_pipeline('fromvar_medium', len(POPULATION_MEDIUM), fromvar_medium)
