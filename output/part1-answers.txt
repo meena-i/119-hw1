@@ -1,7 +1,7 @@
 q1,3
 q2,True
 q3a,False
-q4,['University of Michigan-Ann Arbor', 'EPFL', 'The University of Tokyo', 'Zhejiang University', 'University of Pennsylvania']
+q4,['Georgia Institute of Technology', 'University of California, Los Angeles (UCLA)', 'University of St Andrews', 'The University of Auckland', 'University of Chicago']
 q5a,[100, 100, 100, 100, 100, 100, 100, 100]
 q5b,[100, 100, 100, 100, 100, 100, 100, 100]
 q5c,100
